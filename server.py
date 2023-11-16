@@ -1,4 +1,5 @@
 from flask import Flask, request
+from flask_cors import CORS, cross_origin
 from werkzeug.utils import secure_filename
 from src.services.FaceDetector import FaceDetector
 from src.libs.utils import getImagesForTrain
@@ -9,6 +10,7 @@ import logging
 
 app = Flask(__name__)
 app.config.from_pyfile('application.cfg', silent=True)
+CORS(app)
 
 @app.route("/detect", methods=['POST'])
 def upload_image_detector():
@@ -39,8 +41,8 @@ def upload_image_detector():
 
 @app.route("/upload/train", methods=['POST'])
 def upload_images_train():
-    f = request.files['image']
     requestForm = request.form.to_dict()
+    f = request.files['image']
 
     IMAGE_TRAIN_PATH = app.config.get('IMAGE_TRAIN_PATH')
     RAW_IMAGE_PATH = os.path.join(app.root_path, f'{IMAGE_TRAIN_PATH}/raw')
@@ -57,7 +59,7 @@ def upload_images_train():
     userId = requestForm.get('userId')
     imageId = requestForm.get('imageId')
 
-    if (type(img) != np.ndarray):
+    if (type(img) == np.ndarray):
         cv2.imwrite(f'{OUTPUT_IMAGE_PATH}/user-{userId}-{imageId}.jpg', img)
         return {
             "message": f"Imagem {imageId} do usuário ({userId}) salva com sucesso!"

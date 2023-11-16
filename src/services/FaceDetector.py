@@ -19,27 +19,19 @@ class FaceDetector:
         imageGray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         facesDetect = self.classificator.detectMultiScale(imageGray, scaleFactor=1.1, minNeighbors=5, minSize=(40, 40))
-
+        
         for (x, y, l, a) in facesDetect:
             regionEyes = image[y:y + a, x:x + l]
             regionGrayEyes = cv2.cvtColor(regionEyes, cv2.COLOR_BGR2GRAY)
             eyesDetect = self.eyesClassificator.detectMultiScale(regionGrayEyes)
-
+            
             for (ex, ey, el, ea) in eyesDetect:
                 return cv2.resize(imageGray[y:y + a, x:x + l], (self.width, self.height))
         
         return False
     
     def train(self, X, classes, output):
-        eigenFace = cv2.face.EigenFaceRecognizer.create(num_components=50)
-        fisherFace = cv2.face.FisherFaceRecognizer.create()
-        lbph = cv2.face.LBPHFaceRecognizer.create(radius=2,neighbors=10, grid_x=10, grid_y=10)
-
-        eigenFace.train(X, labels=classes)
-        eigenFace.write(f'{output}/eigen.yml')
-
-        # fisherFace.train(X, labels=classes)
-        # fisherFace.write(f'{output}/fisher.yml')
+        lbph = cv2.face.LBPHFaceRecognizer.create(radius=1,neighbors=10, grid_x=10, grid_y=10)
 
         lbph.train(X, labels=classes)
         lbph.write(f'{output}/lbph.yml')
@@ -47,25 +39,18 @@ class FaceDetector:
     def predict(self, fileName, output):
         img = self.detect(fileName=fileName)
 
-        logging.warn(img)
         if (type(img) != np.ndarray):
             return False
 
-        eigenFace = cv2.face.EigenFaceRecognizer.create()
-        fisherFace = cv2.face.FisherFaceRecognizer.create()
         lbph = cv2.face.LBPHFaceRecognizer.create()
 
-        eigenFace.read(f'{output}/eigen.yml')
         lbph.read(f'{output}/lbph.yml')
 
-        idEigen, trustEigen = eigenFace.predict(img)
         idLbph, trustLbph = lbph.predict(img)
 
-        logging.warning(idLbph)
-
-        if (idEigen == -1):
+        if (idLbph == -1 or trustLbph > 100):
             return False
         
-        return idEigen
+        return idLbph
 
             
