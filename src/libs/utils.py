@@ -6,10 +6,10 @@ import tensorflow as tf
 from tensorflow.keras.utils import to_categorical
 
 KEYBOARD_MAPPING = {
-    'down': 0,
-    'top': 1,
-    'left': 2,
-    'right': 3
+    'ArrowDown': 0,
+    'ArrowUp': 1,
+    'ArrowLeft': 2,
+    'ArrowRight': 3
 }
 
 def getImagesForTrain(path: str):
@@ -28,7 +28,7 @@ def getImagesForTrain(path: str):
 def decode_img(img):
     img = tf.io.decode_jpeg(img, channels=3)
 
-    return tf.image.resize(img, [720, 1280])
+    return tf.image.resize(img, [300, 300])
 
 def get_label(file_path):
     return tf.one_hot(KEYBOARD_MAPPING)
@@ -40,7 +40,7 @@ def getKeyboardForTrain(path: str):
 
     np.random.shuffle(keyboardPathnames)
 
-    for keyboardPath in keyboardPathnames[0:200]:
+    for keyboardPath in keyboardPathnames:
         imageKeyboard = tf.io.read_file(keyboardPath)
         keyboard = os.path.split(keyboardPath)[-1].split('-')[0]
         keyboards.append(KEYBOARD_MAPPING[keyboard])

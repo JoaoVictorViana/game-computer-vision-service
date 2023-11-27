@@ -143,7 +143,7 @@ def upload_keyboard_detector():
 
     imageClassificator = ImageClassificator()
     keyboard = imageClassificator.predict(fileName=fileName, output=OUTPUT_MODEL_PATH)
-    logging.warning(keyboard)
+    
     if (not keyboard):
         return {
             "data": None,
