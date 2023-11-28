@@ -6,7 +6,7 @@ from tensorflow.keras.optimizers import Adam
 from src.libs.utils import decode_img
 import logging
 
-STEPS_PER_EPOCH = 10
+STEPS_PER_EPOCH = 15
 EPOCHS = 10
 VALIDATION_STEPS = 50
 
